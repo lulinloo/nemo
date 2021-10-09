@@ -8,11 +8,15 @@ import (
 	"github.com/lulinloo/nemo/pkg/config"
 	"github.com/lulinloo/nemo/pkg/log"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"go.uber.org/zap"
 )
 
 var cfg *config.Config
 var name string
+var name1 string
+
+// var age string
 var logger *zap.Logger
 
 var rootCmd = &cobra.Command{
@@ -43,7 +47,7 @@ var rootCmd = &cobra.Command{
 		// _ = logger.Sync()
 		// fmt.Println("well")
 		// logger, _ := log.NewLogger()
-		logger.Info("qq")
+		logger.Info(name)
 
 		// name, err := cmd.Flags().GetString("name")
 		// if err != nil {
@@ -54,17 +58,26 @@ var rootCmd = &cobra.Command{
 }
 
 func main() {
-	rootCmd.Flags().StringVarP(&name, "name", "n", "", "name to operate.")
-	rootCmd.MarkFlagRequired("name")
+	// MarkFlagRequired:必须填写的commands;PersistentFlags既可以设置给该 Command，又可以设置给该 Command 的子 Command;
+	// Flags只能设置给指定的 Command
+	rootCmd.PersistentFlags().StringVarP(&name, "name", "n", "", "name to operate.")
+	// rootCmd.MarkFlagRequired("name")
+	viper.BindPFlag("name1", rootCmd.PersistentFlags().Lookup("name"))
+	// fmt.Printf(name1)
+
 	rootCmd.PersistentFlags().StringP("config", "f", "", "Config file path.")
 
 	rootCmd.AddCommand(configCmd)
 	configCmd.AddCommand(configCatCmd)
 
-	rootCmd.AddCommand(versionCmd)
+	rootCmd.AddCommand(runnowCmd)
+
+	// viper.BindPFlag("age", rootCmd.PersistentFlags().Lookup("age"))
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Printf("command failed")
 	}
+
+	
 
 }
